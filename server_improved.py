@@ -125,7 +125,10 @@ def save_image_to_galeri_folder(file_storage):
     ext = filename.rsplit('.', 1)[-1].lower()
     unique_filename = f"{uuid.uuid4().hex}.{ext}"
     galeri_dir = '/tmp/galeri' if os.environ.get('VERCEL') else os.path.join(_BASE_DIR, 'static', 'img', 'galeri')
-    os.makedirs(galeri_dir, exist_ok=True)
+    try:
+        os.makedirs(galeri_dir, exist_ok=True)
+    except Exception:
+        pass
     filepath = os.path.join(galeri_dir, unique_filename)
     file_storage.save(filepath)
     return f"img/galeri/{unique_filename}"
@@ -721,7 +724,10 @@ def upload_laporan():
                 filename = secure_filename(file.filename)
                 filename = f"{int(time.time())}_{filename}"
                 filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+                try:
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+except Exception:
+    pass
                 file.save(filepath)
 
                 with get_db_connection() as conn:
@@ -859,7 +865,10 @@ def upload_informasi():
         if file and file.filename and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             filename = f"{int(time.time())}_{filename}"
-            os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+            try:
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+except Exception:
+    pass
             full_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(full_path)
             file_path = f"/static/uploads/{filename}"
@@ -1274,8 +1283,14 @@ def notifikasi_kirim():
         return render_template('error.html', message="Terjadi kesalahan saat mengirim notifikasi")
 
 # Ensure upload directories exist
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-os.makedirs(os.path.join(_BASE_DIR, 'static', 'img', 'galeri'), exist_ok=True)
+try:
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+except Exception:
+    pass
+try:
+    os.makedirs(os.path.join(_BASE_DIR, 'static', 'img', 'galeri'), exist_ok=True)
+except Exception:
+    pass
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
