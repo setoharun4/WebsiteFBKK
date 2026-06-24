@@ -27,7 +27,7 @@ class Config:
     DB_PASSWORD = os.environ.get('DB_PASSWORD', '')
     DB_NAME = os.environ.get('DB_NAME', 'fbkk_db')
     DB_SSL = os.environ.get('DB_SSL', 'false').lower() in ('true', '1', 'yes')
-    UPLOAD_FOLDER = os.path.join(_BASE_DIR, 'static', 'uploads')
+    UPLOAD_FOLDER = '/tmp/uploads' if os.environ.get('VERCEL') else os.path.join(_BASE_DIR, 'static', 'uploads')
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max file size
     ALLOWED_EXTENSIONS = {'pdf', 'docx', 'xlsx', 'png', 'jpg', 'jpeg'}
     TEMPLATES_AUTO_RELOAD = True
@@ -124,7 +124,7 @@ def save_image_to_galeri_folder(file_storage):
     filename = secure_filename(file_storage.filename)
     ext = filename.rsplit('.', 1)[-1].lower()
     unique_filename = f"{uuid.uuid4().hex}.{ext}"
-    galeri_dir = os.path.join(_BASE_DIR, 'static', 'img', 'galeri')
+    galeri_dir = '/tmp/galeri' if os.environ.get('VERCEL') else os.path.join(_BASE_DIR, 'static', 'img', 'galeri')
     os.makedirs(galeri_dir, exist_ok=True)
     filepath = os.path.join(galeri_dir, unique_filename)
     file_storage.save(filepath)
