@@ -1,0 +1,27 @@
+<header class="site-header">
+    <nav class="navbar">
+        <a href="{{ url_for('home') }}" class="brand">
+            <img src="{{ url_for('static', filename='img/logodisnaker.png') }}" alt="Logo Disnaker" onerror="this.style.display='none'">
+            <img src="{{ url_for('static', filename='img/logofbkk.png') }}" alt="Logo FBKK" onerror="this.style.display='none'">
+            <span class="brand-name">FBKK Jember</span>
+        </a>
+
+        <button class="nav-toggle" type="button" aria-label="Buka menu" aria-expanded="false">☰</button>
+
+        <div class="nav-menu">
+            <a href="{{ url_for('home') }}" class="nav-link">Beranda</a>
+            <a href="{{ url_for('profil') }}" class="nav-link">Profil</a>
+            <a href="{{ url_for('galeri') }}" class="nav-link">Galeri</a>
+            {% if session.get('user_id') %}
+                {% if session.get('role') == 'fbkk' %}
+                    <a href="{{ url_for('dashboard_anggota') }}" class="nav-link">Dashboard</a>
+                {% elif session.get('role') == 'disnaker' %}
+                    <a href="{{ url_for('dashboard_disnaker') }}" class="nav-link">Dashboard</a>
+                {% endif %}
+                <a href="{{ url_for('logout') }}" class="nav-link nav-link--logout">Keluar</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="nav-link nav-link--cta">Masuk</a>
+            {% endif %}
+        </div>
+    </nav>
+</header>

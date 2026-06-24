@@ -1,0 +1,66 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+venv/
+env/
+.venv/
+
+# Flask
+instance/
+app.log
+
+# Environment
+.env
+.env.*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node.js / Next.js (legacy boilerplate - not used by Flask)
+node_modules/
+/.next/
+/out/
+npm-debug.log*
+yarn-debug.log*
+.pnpm-debug.log*
+*.tsbuildinfo
+next-env.d.ts
+/app/
+/components/
+/hooks/
+/lib/
+/styles/
+components.json
+next.config.mjs
+postcss.config.mjs
+tailwind.config.ts
+tsconfig.json
+package.json
+package-lock.json
+pnpm-lock.yaml
+/public/
+
+# Uploads (user-uploaded content, not tracked in git)
+static/uploads/*
+!static/uploads/.gitkeep
+
+# Vercel
+.vercel
+
+# Database exports (contain sensitive data)
+database/fbkk_db_export.sql

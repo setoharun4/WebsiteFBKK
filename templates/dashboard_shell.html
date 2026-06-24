@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container app-page">
+    <div class="page-header app-page-header">
+        <h1>{% block page_heading %}{% endblock %}</h1>
+        {% block page_subtitle %}<p class="page-subtitle"></p>{% endblock %}
+    </div>
+
+    <div class="app-layout">
+        {% if session.get('role') == 'disnaker' %}
+            {% include 'partials/sidebar_disnaker.html' %}
+        {% elif session.get('role') == 'fbkk' %}
+            {% include 'partials/sidebar_anggota.html' %}
+        {% endif %}
+
+        <div class="app-main">
+            {% block page_content %}{% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}

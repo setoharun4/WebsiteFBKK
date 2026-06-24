@@ -1,0 +1,48 @@
+{% extends "dashboard_shell.html" %}
+
+{% block title %}Notifikasi — FBKK{% endblock %}
+{% block page_heading %}Notifikasi{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Pesan dan pengingat dari admin Disnaker</p>{% endblock %}
+
+{% block page_content %}
+    {% if notifikasi_list %}
+    <div class="notifikasi-list">
+        {% for n in notifikasi_list %}
+        <article class="notifikasi-item{{ '' if n.is_read else ' notifikasi-item--unread' }}" data-id="{{ n.id }}" data-link="{{ n.link_url or '' }}">
+            <div class="notifikasi-item-header">
+                <div>
+                    <span class="notifikasi-jenis notifikasi-jenis--{{ n.jenis }}">
+                        {% if n.jenis == 'permintaan_data' %}Permintaan Data
+                        {% elif n.jenis == 'permintaan_laporan' %}Permintaan Laporan
+                        {% else %}Umum{% endif %}
+                    </span>
+                    <h3 class="notifikasi-judul">{{ n.judul }}</h3>
+                </div>
+                <time class="notifikasi-waktu">{{ n.created_at.strftime('%d/%m/%Y %H:%M') if n.created_at else '-' }}</time>
+            </div>
+            <p class="notifikasi-isi">{{ n.isi }}</p>
+            <div class="notifikasi-item-footer">
+                <span class="notifikasi-dari">Dari: Admin ({{ n.dari_username }})</span>
+                {% if not n.is_read %}
+                <button type="button" class="btn btn-primary btn-sm btn-baca-notifikasi" data-id="{{ n.id }}">
+                    {% if n.link_url %}Buka &amp; Tandai Dibaca{% else %}Tandai Dibaca{% endif %}
+                </button>
+                {% elif n.link_url %}
+                <a href="{{ n.link_url }}" class="btn btn-secondary btn-sm">Buka Halaman</a>
+                {% else %}
+                <span class="notifikasi-status-read">Sudah dibaca</span>
+                {% endif %}
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card empty-state section">
+        <p>Belum ada notifikasi. Admin Disnaker akan mengirim pesan di sini jika diperlukan.</p>
+    </div>
+    {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/notifikasi.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,37 @@
+<aside class="app-sidebar" aria-label="Navigasi dashboard anggota">
+    <p class="app-sidebar-label">Dashboard Anggota</p>
+    <nav class="app-sidebar-nav">
+        <a href="{{ url_for('dashboard_anggota') }}" class="app-sidebar-link{{ ' active' if current_endpoint == 'dashboard_anggota' else '' }}">
+            <span class="app-sidebar-icon" aria-hidden="true">📈</span>
+            <span class="app-sidebar-text">
+                <strong>Data Tahunan</strong>
+                <small>Input & riwayat data BKK</small>
+            </span>
+        </a>
+        <a href="{{ url_for('upload_laporan') }}" class="app-sidebar-link{{ ' active' if current_endpoint == 'upload_laporan' else '' }}">
+            <span class="app-sidebar-icon" aria-hidden="true">📤</span>
+            <span class="app-sidebar-text">
+                <strong>Upload Laporan</strong>
+                <small>Unggah laporan kegiatan</small>
+            </span>
+        </a>
+        <a href="{{ url_for('dashboard_history') }}" class="app-sidebar-link{{ ' active' if current_endpoint == 'dashboard_history' else '' }}">
+            <span class="app-sidebar-icon" aria-hidden="true">📋</span>
+            <span class="app-sidebar-text">
+                <strong>Riwayat Laporan</strong>
+                <small>Semua laporan diunggah</small>
+            </span>
+        </a>
+        <a href="{{ url_for('notifikasi_inbox') }}" class="app-sidebar-link{{ ' active' if current_endpoint == 'notifikasi_inbox' else '' }}">
+            <span class="app-sidebar-icon" aria-hidden="true">🔔</span>
+            <span class="app-sidebar-text">
+                <strong>Notifikasi</strong>
+                <small>Pesan dari admin</small>
+            </span>
+            {% if unread_notifikasi > 0 %}
+            <span class="app-sidebar-badge">{{ unread_notifikasi }}</span>
+            {% endif %}
+        </a>
+    </nav>
+    <a href="{{ url_for('home') }}" class="app-sidebar-back">← Kembali ke Beranda</a>
+</aside>

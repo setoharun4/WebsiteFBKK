@@ -1,0 +1,127 @@
+{% extends "dashboard_shell.html" %}
+
+{% block title %}Dashboard Anggota — FBKK{% endblock %}
+{% block page_heading %}Dashboard Anggota{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">{% if anggota %}{{ anggota.sekolah }}{% else %}Kelola data BKK sekolah Anda{% endif %}</p>{% endblock %}
+
+{% block page_content %}
+    {% if pending_verification %}
+    <div class="card empty-state section">
+        <p>Akun Anda belum diverifikasi oleh admin Disnaker. Setelah registrasi, admin akan menghubungkan akun Anda dengan data sekolah BKK.</p>
+    </div>
+    {% else %}
+    <div class="data-section">
+        <div class="form-section section">
+            <h2 class="section-title">Input Data Tahunan</h2>
+            <form id="annualDataForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="tahun" class="form-label">Tahun</label>
+                        <input type="number" id="tahun" name="tahun" class="form-input" value="2025" min="2020" max="2030" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="jumlah_lulusan" class="form-label">Jumlah Lulusan</label>
+                        <input type="number" id="jumlah_lulusan" name="jumlah_lulusan" class="form-input" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="lanjut_bekerja" class="form-label">Lanjut Bekerja</label>
+                        <input type="number" id="lanjut_bekerja" name="lanjut_bekerja" class="form-input" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="kuliah" class="form-label">Kuliah</label>
+                        <input type="number" id="kuliah" name="kuliah" class="form-input" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="wirausaha" class="form-label">Wirausaha</label>
+                        <input type="number" id="wirausaha" name="wirausaha" class="form-input" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="belum_bekerja" class="form-label">Belum Bekerja</label>
+                        <input type="number" id="belum_bekerja" name="belum_bekerja" class="form-input" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="jumlah_mitra" class="form-label">Jumlah Mitra</label>
+                        <input type="number" id="jumlah_mitra" name="jumlah_mitra" class="form-input" min="0" required>
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="tanda_daftar_bkk" name="tanda_daftar_bkk">
+                            Tanda Daftar BKK
+                        </label>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Simpan Data</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="data-display-section section">
+            <h2 class="section-title">Data Tahunan Tersimpan</h2>
+            {% if data_tahunan %}
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Tahun</th>
+                            <th>Lulusan</th>
+                            <th>Kerja</th>
+                            <th>Kuliah</th>
+                            <th>Wirausaha</th>
+                            <th>Belum Kerja</th>
+                            <th>Mitra</th>
+                            <th>Tanda Daftar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for data in data_tahunan %}
+                        <tr>
+                            <td data-label="Tahun">{{ data.tahun }}</td>
+                            <td data-label="Lulusan">{{ data.jumlah_lulusan }}</td>
+                            <td data-label="Kerja">{{ data.lanjut_bekerja }}</td>
+                            <td data-label="Kuliah">{{ data.kuliah }}</td>
+                            <td data-label="Wirausaha">{{ data.wirausaha }}</td>
+                            <td data-label="Belum Kerja">{{ data.belum_bekerja }}</td>
+                            <td data-label="Mitra">{{ data.jumlah_mitra }}</td>
+                            <td data-label="Tanda Daftar">
+                                <span class="status-badge {{ 'status-active' if data.tanda_daftar_bkk else 'status-inactive' }}">
+                                    {{ 'Ya' if data.tanda_daftar_bkk else 'Tidak' }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state"><p>Belum ada data tahunan. Isi form di atas untuk menambah.</p></div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const annualForm = document.getElementById("annualDataForm");
+if (annualForm) {
+    annualForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+        const btn = this.querySelector('button[type="submit"]');
+        btn.disabled = true;
+        btn.textContent = 'Menyimpan...';
+        fetch("/simpan_data_tahunan", { method: "POST", body: new FormData(this) })
+            .then(r => r.json())
+            .then(data => {
+                const n = document.createElement('div');
+                n.className = 'notification notification-' + (data.success ? 'success' : 'error');
+                n.textContent = data.success ? 'Data berhasil disimpan!' : ('Error: ' + data.error);
+                document.body.appendChild(n);
+                setTimeout(() => n.remove(), 3000);
+                if (data.success) setTimeout(() => location.reload(), 1200);
+            })
+            .finally(() => { btn.disabled = false; btn.textContent = 'Simpan Data'; });
+    });
+}
+</script>
+{% endblock %}

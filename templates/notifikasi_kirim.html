@@ -1,0 +1,105 @@
+{% extends "dashboard_shell.html" %}
+
+{% block title %}Kirim Notifikasi — FBKK{% endblock %}
+{% block page_heading %}Kirim Notifikasi{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Kirim pengingat ke pengurus akun sekolah FBKK (satu arah)</p>{% endblock %}
+
+{% block page_content %}
+    <div class="form-section section">
+        <h2 class="section-title">Pesan Baru</h2>
+        <form action="{{ url_for('notifikasi_kirim') }}" method="POST">
+            <div class="form-grid">
+                <div class="form-group" style="grid-column:1/-1;">
+                    <label for="ke_user_id" class="form-label">Penerima</label>
+                    <select id="ke_user_id" name="ke_user_id" class="form-select" required>
+                        <option value="">-- Pilih akun pengurus sekolah --</option>
+                        {% for p in penerima_list %}
+                        <option value="{{ p.user_id }}" {% if selected_user|string == p.user_id|string %}selected{% endif %}>
+                            {{ p.sekolah }} ({{ p.username }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="jenis" class="form-label">Jenis Notifikasi</label>
+                    <select id="jenis" name="jenis" class="form-select" required>
+                        <option value="permintaan_data">Permintaan Input Data Tahunan</option>
+                        <option value="permintaan_laporan">Permintaan Upload Laporan</option>
+                        <option value="umum">Pesan Umum</option>
+                    </select>
+                </div>
+                <div class="form-group" style="grid-column:1/-1;">
+                    <label for="judul" class="form-label">Judul</label>
+                    <input type="text" id="judul" name="judul" class="form-input" placeholder="Contoh: Mohon lengkapi data tahunan 2025" required maxlength="255">
+                </div>
+                <div class="form-group" style="grid-column:1/-1;">
+                    <label for="isi" class="form-label">Isi Pesan</label>
+                    <textarea id="isi" name="isi" class="form-textarea" rows="4" placeholder="Tulis pesan pengingat untuk pengurus sekolah..." required maxlength="1000"></textarea>
+                    <small class="form-help">Maks. 1000 karakter. Hanya akun terverifikasi yang dapat menerima notifikasi.</small>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Kirim Notifikasi</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="card section">
+        <h2 class="section-title">Riwayat Terkirim</h2>
+        {% if riwayat_kirim %}
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Waktu</th>
+                        <th>Penerima</th>
+                        <th>Sekolah</th>
+                        <th>Judul</th>
+                        <th>Jenis</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for n in riwayat_kirim %}
+                    <tr>
+                        <td data-label="Waktu">{{ n.created_at.strftime('%d/%m/%Y %H:%M') if n.created_at else '-' }}</td>
+                        <td data-label="Penerima">{{ n.ke_username }}</td>
+                        <td data-label="Sekolah">{{ n.sekolah or '-' }}</td>
+                        <td data-label="Judul">{{ n.judul }}</td>
+                        <td data-label="Jenis">
+                            {% if n.jenis == 'permintaan_data' %}Data
+                            {% elif n.jenis == 'permintaan_laporan' %}Laporan
+                            {% else %}Umum{% endif %}
+                        </td>
+                        <td data-label="Status">
+                            <span class="status-badge {{ 'status-active' if n.is_read else 'status-inactive' }}">
+                                {{ 'Dibaca' if n.is_read else 'Belum dibaca' }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state"><p>Belum ada notifikasi terkirim.</p></div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('jenis')?.addEventListener('change', function () {
+  const judul = document.getElementById('judul');
+  const isi = document.getElementById('isi');
+  if (!judul || !isi || judul.value || isi.value) return;
+  if (this.value === 'permintaan_data') {
+    judul.value = 'Mohon lengkapi data tahunan';
+    isi.value = 'Admin meminta Anda untuk segera mengisi data tahunan BKK di dashboard anggota.';
+  } else if (this.value === 'permintaan_laporan') {
+    judul.value = 'Mohon upload laporan kegiatan';
+    isi.value = 'Admin meminta Anda untuk mengunggah laporan kegiatan BKK terbaru.';
+  }
+});
+</script>
+{% endblock %}

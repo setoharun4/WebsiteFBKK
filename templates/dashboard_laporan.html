@@ -1,0 +1,45 @@
+{% extends "dashboard_shell.html" %}
+
+{% block title %}Data Laporan — FBKK{% endblock %}
+{% block page_heading %}Data Laporan Masuk{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Laporan dari seluruh anggota FBKK</p>{% endblock %}
+
+{% block page_content %}
+    <div class="card section">
+        <div class="table-container" style="border:none;box-shadow:none;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Judul</th>
+                        <th>Deskripsi</th>
+                        <th>Sekolah</th>
+                        <th>Tanggal</th>
+                        <th>File</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in laporan_list %}
+                    <tr>
+                        <td data-label="No">{{ loop.index }}</td>
+                        <td data-label="Judul">{{ item.judul }}</td>
+                        <td data-label="Deskripsi" class="description-cell">{{ item.deskripsi[:60] }}{% if item.deskripsi|length > 60 %}…{% endif %}</td>
+                        <td data-label="Sekolah">{{ item.sekolah }}</td>
+                        <td data-label="Tanggal">{{ item.created_at.strftime('%d/%m/%Y') if item.created_at else '-' }}</td>
+                        <td data-label="File"><a href="/static/uploads/{{ item.file_path }}" class="btn-download btn-sm" download>Unduh</a></td>
+                        <td data-label="Aksi">
+                            <form action="{{ url_for('hapus_laporan', id=item.id) }}" method="POST" class="inline-form"
+                                  onsubmit="return confirm('Hapus laporan ini?');">
+                                <button type="submit" class="btn btn-delete btn-sm">Hapus</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="7" class="no-data">Belum ada laporan masuk</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

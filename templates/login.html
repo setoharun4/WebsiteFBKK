@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Login - FBKK{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1>Masuk ke Akun</h1>
+            <p>Silakan masuk untuk mengakses sistem FBKK</p>
+        </div>
+        
+        {% if error %}
+        <div class="alert-box alert-box--error" role="alert">{{ error }}</div>
+        {% endif %}
+        
+        <form method="POST" action="{{ url_for('login') }}" class="auth-form" novalidate>
+            <!-- Added CSRF token for security -->
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            
+            <div class="form-group">
+                <label for="username" class="form-label">Username</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    class="form-input"
+                    required 
+                    autocomplete="username"
+                    aria-describedby="username-error"
+                    value="{{ request.form.username if request.form.username }}"
+                >
+                <div id="username-error" class="error-message" role="alert"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="password" class="form-label">Password</label>
+                <div class="password-input-wrapper">
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        class="form-input"
+                        required 
+                        autocomplete="current-password"
+                        aria-describedby="password-error"
+                    >
+                    <!-- Added password visibility toggle -->
+                    <button type="button" class="password-toggle" aria-label="Toggle password visibility">
+                        <span class="password-toggle-icon">👁️</span>
+                    </button>
+                </div>
+                <div id="password-error" class="error-message" role="alert"></div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full">
+                <span class="btn-text">Masuk</span>
+                <span class="btn-loading" style="display: none;">Memproses...</span>
+            </button>
+
+            <div class="auth-links">
+                <p>Belum punya akun? <a href="{{ url_for('register') }}" class="link">Daftar sekarang</a></p>
+                <p><a href="{{ url_for('forgot_password') }}" class="link">Lupa password?</a></p>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('.auth-form');
+    const passwordToggle = document.querySelector('.password-toggle');
+    const passwordInput = document.querySelector('#password');
+    
+    // Password visibility toggle
+    if (passwordToggle && passwordInput) {
+        passwordToggle.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.querySelector('.password-toggle-icon').textContent = type === 'password' ? '👁️' : '🙈';
+        });
+    }
+    
+    // Form validation
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        const username = document.getElementById('username');
+        const password = document.getElementById('password');
+        
+        // Clear previous errors
+        document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+        document.querySelectorAll('.form-input').forEach(el => el.classList.remove('error'));
+        
+        // Validate username
+        if (!username.value.trim()) {
+            showError('username', 'Username harus diisi');
+            isValid = false;
+        }
+        
+        // Validate password
+        if (!password.value) {
+            showError('password', 'Password harus diisi');
+            isValid = false;
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+            return false;
+        }
+        
+        // Show loading state
+        const btn = form.querySelector('button[type="submit"]');
+        btn.disabled = true;
+        btn.querySelector('.btn-text').style.display = 'none';
+        btn.querySelector('.btn-loading').style.display = 'inline';
+    });
+    
+    function showError(fieldId, message) {
+        const field = document.getElementById(fieldId);
+        const errorEl = document.getElementById(fieldId + '-error');
+        field.classList.add('error');
+        errorEl.textContent = message;
+    }
+});
+</script>
+{% endblock %}

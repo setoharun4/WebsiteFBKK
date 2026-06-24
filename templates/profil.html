@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Profil — FBKK Jember{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>Profil FBKK</h1>
+        <p class="page-subtitle">Forum Bursa Kerja Khusus Kabupaten Jember</p>
+    </div>
+
+    <div class="card section profil-grid">
+        <div class="profil-photo">
+            <img src="{{ url_for('static', filename='img/ketuapengurus.jpeg') }}" alt="Ketua FBKK"
+                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22260%22%3E%3Crect fill=%22%23e2e8f0%22 width=%22200%22 height=%22260%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%2394a3b8%22%3E👤%3C/text%3E%3C/svg%3E'">
+            <h3>Ahmad Helmi S.Pd.</h3>
+            <p style="color:var(--text-muted);font-size:0.875rem;">Ketua FBKK SMK Kab. Jember</p>
+        </div>
+        <div class="profil-text">
+            <h2 style="margin-top:0;">Sambutan Ketua</h2>
+            <p>Assalamu'alaikum warahmatullahi wabarakatuh.</p>
+            <p>Pertama-tama, mari kita panjatkan puji syukur kehadirat Allah SWT karena atas rahmat dan karunia-Nya, kita dapat membentuk Forum Bursa Kerja Khusus (FBKK) SMK di Kab. Jember ini.
+            Saya, selaku Ketua FBKK SMK Kab. Jember, mengucapkan terima kasih yang sebesar-besarnya atas dukungan dan suportnya Bapak/Ibu semua. Ini merupakan bukti nyata komitmen kita untuk meningkatkan kualitas lulusan dan menjembatani antara dunia pendidikan dengan dunia kerja.
+            Peran FBKK SMK sangat penting dalam mempersiapkan lulusan agar siap kerja dan memiliki daya saing yang kuat. Melalui FBKK SMK seperti ini, kita dapat saling berbagi informasi, pengalaman, dan strategi dalam meningkatkan kualitas BKK di masing-masing sekolah.
+            Saya berharap, melalui Forum Bursa Kerja Khusus (FBKK) SMK ini, kita dapat menemukan solusi-solusi inovatif untuk meningkatkan efektivitas BKK, memperluas jaringan kerjasama dengan Dunia Usaha dan Dunia Industri, dan memastikan lulusan kita memiliki peluang kerja yang lebih baik.
+            Mari kita terus berupaya meningkatkan peran FBKK SMK dalam mendukung pembangunan nasional, khususnya dalam menciptakan sumber daya manusia yang kompeten dan siap bersaing.
+            Semoga dengan adanya Forum Bursa Kerja Khusus (FBKK) SMK ini berjalan lancar, sukses, bermanfaat dan memberikan hasil yang positif.</p>
+            <p>Wassalamualaikum warahmatullahi wabarakatuh.
+
+            </p>
+        </div>
+    </div>
+
+    <div class="card section">
+        <h2 style="margin-top:0;">Visi &amp; Misi</h2>
+        <h3 style="color:var(--accent);">Visi</h3>
+        <p>Terwujudnya lulusan berkarakter, kompeten, berbudaya lingkungan yang unggul pada dunia kerja, wirausaha, dan mampu melanjutkan pendidikannya di era global.</p>
+        <h3 style="color:var(--accent);">Misi</h3>
+        <ul class="profil-list">
+            <li>Menanamkan dan mengamalkan ketakwaan kepada Tuhan yang Maha Esa</li>
+            <li>Menanamkan dan mengamalkan pendidikan karakter secara konsisten</li>
+            <li>Menerapkan pendidikan dan pelatihan berbasis kebutuhan dunia usaha dan industri</li>
+            <li>Menanamkan jiwa wirausaha dan melatih wirausaha berbasis techno-socioprenuer</li>
+            <li>Menanamkan dan mengamalkan budaya lingkungan secara berkelanjutan</li>
+            <li>Melatih siswa beradaptasi dan berkompetisi sesuai dengan perkembangan ilmu pengetahuan dan teknologi di tingkat nasional maupun internasional.</li>
+        </ul>
+    </div>
+
+    <div class="card section">
+        <div class="section-header">
+            <h2>Daftar Anggota FBKK</h2>
+            <p>{{ anggota_list|length }} sekolah terdaftar</p>
+        </div>
+        <div class="table-toolbar">
+            <input type="text" id="search" class="form-input" placeholder="Cari nama sekolah..." onkeyup="fetchData()">
+            <select id="sort_by" class="form-select" onchange="fetchData()">
+                <option value="id">Urutkan: ID</option>
+                <option value="sekolah">Urutkan: Nama Sekolah</option>
+                <option value="kecamatan">Urutkan: Kecamatan</option>
+            </select>
+            <div class="toolbar-option">
+                <input type="checkbox" id="toggle-scroll" checked>
+                <label for="toggle-scroll">Batasi tinggi tabel (scroll)</label>
+            </div>
+        </div>
+        <div class="table-container anggota-table-container scrollable">
+            <table class="anggota-table">
+                <thead>
+                    <tr><th>No</th><th>Nama Sekolah</th><th>Alamat</th><th>Kecamatan</th></tr>
+                </thead>
+                <tbody id="anggota-tbody">
+                    {% for anggota_fbkk in anggota_list %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>
+                            {% if session.get('role') == 'disnaker' %}
+                            <a href="#" class="open-modal link" data-sekolah="{{ anggota_fbkk['id'] }}">{{ anggota_fbkk['sekolah'] }}</a>
+                            {% else %}
+                            {{ anggota_fbkk['sekolah'] }}
+                            {% endif %}
+                        </td>
+                        <td>{{ anggota_fbkk['alamat'] }}</td>
+                        <td>{{ anggota_fbkk['kecamatan'] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% if session.get('role') == 'disnaker' %}
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modal-title">Data Tahunan Sekolah</h3>
+            <button type="button" class="modal-close close-modal" aria-label="Tutup">×</button>
+        </div>
+        <div class="table-container" style="border:none;box-shadow:none;">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Tahun</th><th>Kerja</th><th>Kuliah</th><th>Wirausaha</th><th>Belum Kerja</th><th>Total</th></tr>
+                </thead>
+                <tbody id="modal-body">
+                    <tr><td colspan="6" class="no-data">Memuat data...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/profil.js') }}"></script>
+{% endblock %}

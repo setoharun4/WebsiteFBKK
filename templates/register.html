@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block title %}Daftar - FBKK{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1>Buat Akun Baru</h1>
+            <p>Daftar untuk mengakses sistem FBKK</p>
+        </div>
+        
+        {% if error %}
+        <div class="alert-box alert-box--error" role="alert">{{ error }}</div>
+        {% endif %}
+        
+        <form method="POST" action="{{ url_for('register') }}" class="auth-form" novalidate>
+            <!-- Added CSRF token for security -->
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            
+            <div class="form-group">
+                <label for="username" class="form-label">Username</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    class="form-input"
+                    required 
+                    autocomplete="username"
+                    aria-describedby="username-error username-help"
+                    value="{{ request.form.username if request.form.username }}"
+                >
+                <div id="username-help" class="form-help">Minimal 3 karakter, hanya huruf, angka, dan underscore</div>
+                <div id="username-error" class="error-message" role="alert"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="password" class="form-label">Password</label>
+                <div class="password-input-wrapper">
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        class="form-input"
+                        required 
+                        autocomplete="new-password"
+                        aria-describedby="password-error password-help"
+                    >
+                    <!-- Added password visibility toggle -->
+                    <button type="button" class="password-toggle" aria-label="Toggle password visibility">
+                        <span class="password-toggle-icon">👁️</span>
+                    </button>
+                </div>
+                <div id="password-help" class="form-help">Minimal 8 karakter dengan kombinasi huruf dan angka</div>
+                <div id="password-error" class="error-message" role="alert"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm_password" class="form-label">Konfirmasi Password</label>
+                <div class="password-input-wrapper">
+                    <input 
+                        type="password" 
+                        id="confirm_password" 
+                        name="confirm_password" 
+                        class="form-input"
+                        required 
+                        autocomplete="new-password"
+                        aria-describedby="confirm-password-error"
+                    >
+                    <!-- Added password visibility toggle -->
+                    <button type="button" class="password-toggle" aria-label="Toggle password visibility">
+                        <span class="password-toggle-icon">👁️</span>
+                    </button>
+                </div>
+                <div id="confirm-password-error" class="error-message" role="alert"></div>
+            </div>
+
+            <!-- Added terms and conditions checkbox -->
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="terms" name="terms" required>
+                    <span class="checkmark"></span>
+                    Saya setuju dengan <a href="/terms" target="_blank" class="link">syarat dan ketentuan</a>
+                </label>
+                <div id="terms-error" class="error-message" role="alert"></div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full">
+                <span class="btn-text">Daftar</span>
+                <span class="btn-loading" style="display: none;">Memproses...</span>
+            </button>
+
+            <div class="auth-links">
+                <p>Sudah punya akun? <a href="{{ url_for('login') }}" class="link">Masuk sekarang</a></p>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('.auth-form');
+    const passwordToggles = document.querySelectorAll('.password-toggle');
+    
+    // Password visibility toggles
+    passwordToggles.forEach(toggle => {
+        toggle.addEventListener('click', function() {
+            const input = this.parentElement.querySelector('input');
+            const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+            input.setAttribute('type', type);
+            this.querySelector('.password-toggle-icon').textContent = type === 'password' ? '👁️' : '🙈';
+        });
+    });
+    
+    // Real-time validation
+    const username = document.getElementById('username');
+    const password = document.getElementById('password');
+    const confirmPassword = document.getElementById('confirm_password');
+    
+    username.addEventListener('blur', validateUsername);
+    password.addEventListener('input', validatePassword);
+    confirmPassword.addEventListener('input', validateConfirmPassword);
+    
+    // Form submission validation
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        // Clear previous errors
+        document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+        document.querySelectorAll('.form-input').forEach(el => el.classList.remove('error'));
+        
+        // Validate all fields
+        if (!validateUsername()) isValid = false;
+        if (!validatePassword()) isValid = false;
+        if (!validateConfirmPassword()) isValid = false;
+        if (!validateTerms()) isValid = false;
+        
+        if (!isValid) {
+            e.preventDefault();
+            return false;
+        }
+        
+        // Show loading state
+        const btn = form.querySelector('button[type="submit"]');
+        btn.disabled = true;
+        btn.querySelector('.btn-text').style.display = 'none';
+        btn.querySelector('.btn-loading').style.display = 'inline';
+    });
+    
+    function validateUsername() {
+        const value = username.value.trim();
+        if (!value) {
+            showError('username', 'Username harus diisi');
+            return false;
+        }
+        if (value.length < 3) {
+            showError('username', 'Username minimal 3 karakter');
+            return false;
+        }
+        if (!/^[a-zA-Z0-9_]+$/.test(value)) {
+            showError('username', 'Username hanya boleh mengandung huruf, angka, dan underscore');
+            return false;
+        }
+        clearError('username');
+        return true;
+    }
+    
+    function validatePassword() {
+        const value = password.value;
+        if (!value) {
+            showError('password', 'Password harus diisi');
+            return false;
+        }
+        if (value.length < 8) {
+            showError('password', 'Password minimal 8 karakter');
+            return false;
+        }
+        if (!/(?=.*[a-zA-Z])(?=.*\d)/.test(value)) {
+            showError('password', 'Password harus mengandung huruf dan angka');
+            return false;
+        }
+        clearError('password');
+        return true;
+    }
+    
+    function validateConfirmPassword() {
+        const value = confirmPassword.value;
+        if (!value) {
+            showError('confirm_password', 'Konfirmasi password harus diisi');
+            return false;
+        }
+        if (value !== password.value) {
+            showError('confirm_password', 'Password tidak cocok');
+            return false;
+        }
+        clearError('confirm_password');
+        return true;
+    }
+    
+    function validateTerms() {
+        const terms = document.getElementById('terms');
+        if (!terms.checked) {
+            showError('terms', 'Anda harus menyetujui syarat dan ketentuan');
+            return false;
+        }
+        clearError('terms');
+        return true;
+    }
+    
+    function showError(fieldId, message) {
+        const field = document.getElementById(fieldId);
+        const errorEl = document.getElementById(fieldId + '-error');
+        if (field) field.classList.add('error');
+        if (errorEl) errorEl.textContent = message;
+    }
+    
+    function clearError(fieldId) {
+        const field = document.getElementById(fieldId);
+        const errorEl = document.getElementById(fieldId + '-error');
+        if (field) field.classList.remove('error');
+        if (errorEl) errorEl.textContent = '';
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}Beranda — FBKK Jember{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="container hero-inner">
+        <div>
+            <h1>Forum Bursa Kerja Khusus Kabupaten Jember</h1>
+            <p>Menjembatani dunia pendidikan vokasi dengan dunia kerja melalui koordinasi BKK di seluruh SMK se-Kabupaten Jember.</p>
+            <div class="hero-actions">
+                <a href="{{ url_for('profil') }}" class="btn btn-outline">Lihat Profil</a>
+                <a href="{{ url_for('login') }}" class="btn btn-ghost" style="background:rgb(255 255 255 / 0.2);color:#fff;">Masuk Sistem</a>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <img src="{{ url_for('static', filename='img/fotofbkk.jpg') }}" alt="FBKK Jember"
+                 onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'hero-placeholder\'>🏫</div>'">
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="label">Sekolah Terdaftar BKK</div>
+            <div class="value">{{ sekolah_data.total_sekolah or 0 }}</div>
+            <div class="meta">
+                <span>Negeri: {{ sekolah_data.negeri or 0 }}</span>
+                <span>Swasta: {{ sekolah_data.swasta or 0 }}</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="label">Total Lulusan Terdata</div>
+            <div class="value">{{ total_lulusan or 0 }}</div>
+            <div class="meta"><span>Agregasi seluruh anggota FBKK</span></div>
+        </div>
+        <div class="stat-card">
+            <div class="label">Informasi Aktif</div>
+            <div class="value">{{ informasi|length }}</div>
+            <div class="meta"><span>Pengumuman &amp; berita BKK</span></div>
+        </div>
+    </div>
+
+    <div class="grid-2 section">
+        <div>
+            <div class="intro-card" style="margin-bottom:1.5rem;">
+                <h2>Tentang FBKK Jember</h2>
+                <p>Forum Bursa Kerja Khusus (FBKK) Jember dibentuk untuk mengoordinasikan serta memfasilitasi peran Bursa Kerja Khusus (BKK) di berbagai sekolah di Kabupaten Jember.</p>
+                <p>Melalui pelatihan, bimbingan karier, dan informasi lowongan kerja, FBKK berupaya meningkatkan daya saing lulusan SMK di dunia industri.</p>
+                <p class="read-more"><a href="{{ url_for('profil') }}">Selengkapnya →</a></p>
+            </div>
+
+            <div class="section-header">
+                <h2>Rekapitulasi Data Lulusan</h2>
+                <p>Statistik penempatan kerja, pendidikan lanjut, dan wirausaha per tahun</p>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3>Sekolah Negeri vs Swasta</h3>
+                    <div class="chart-wrap"><canvas id="chartSekolah"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <h3>Total Penempatan Lulusan</h3>
+                    <div class="chart-wrap"><canvas id="chartTotalLulusan"></canvas></div>
+                </div>
+            </div>
+
+            <div class="chart-card" style="margin-bottom:1.5rem;">
+                <h3>Lulusan Per Tahun</h3>
+                <div class="chart-wrap" style="height:280px;"><canvas id="chartLulusan"></canvas></div>
+            </div>
+
+            <div class="table-container">
+                <table class="rekap-table">
+                    <thead>
+                        <tr>
+                            <th>Tahun</th>
+                            <th>SMK Terdata</th>
+                            <th>Jumlah Lulusan</th>
+                            <th>Kerja</th>
+                            <th>Kuliah</th>
+                            <th>Wirausaha</th>
+                            <th>Belum Kerja</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lulusan in lulusan_data %}
+                        <tr>
+                            <td>{{ lulusan.tahun }}</td>
+                            <td>{{ lulusan.jumlah_sekolah }}</td>
+                            <td>{{ lulusan.total_per_tahun }}</td>
+                            <td>{{ lulusan.kerja }}</td>
+                            <td>{{ lulusan.kuliah }}</td>
+                            <td>{{ lulusan.wirausaha }}</td>
+                            <td>{{ lulusan.belum_kerja }}</td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="7" class="no-data">Belum ada data</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <aside>
+            <div class="card">
+                <div class="section-header">
+                    <h2>Informasi BKK</h2>
+                    <p>Pengumuman terbaru</p>
+                </div>
+                <div class="info-list">
+                    {% for info in informasi %}
+                    <div class="info-card">
+                        <h3>{{ info.judul }}</h3>
+                        <p>{{ info.deskripsi }}</p>
+                        {% if info.file_path %}
+                        <a href="{{ info.file_path }}" class="btn-download btn-sm" download>Unduh Lampiran</a>
+                        {% endif %}
+                        <p class="info-date">{{ info.created_at }}</p>
+                    </div>
+                    {% else %}
+                    <p class="no-data" style="padding:1rem;">Belum ada informasi</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const colors = { kerja:'#1d4ed8', kuliah:'#059669', wira:'#d97706', belum:'#94a3b8' };
+const tahunLabels = [{% for l in lulusan_data %}"{{ l.tahun }}",{% endfor %}];
+const dataKerja = [{% for l in lulusan_data %}{{ l.kerja }},{% endfor %}];
+const dataKuliah = [{% for l in lulusan_data %}{{ l.kuliah }},{% endfor %}];
+const dataWira = [{% for l in lulusan_data %}{{ l.wirausaha }},{% endfor %}];
+const dataBelum = [{% for l in lulusan_data %}{{ l.belum_kerja }},{% endfor %}];
+
+if (document.getElementById('chartLulusan')) {
+    new Chart(document.getElementById('chartLulusan'), {
+        type: 'bar',
+        data: {
+            labels: tahunLabels,
+            datasets: [
+                { label: 'Kerja', data: dataKerja, backgroundColor: colors.kerja, borderRadius: 4 },
+                { label: 'Kuliah', data: dataKuliah, backgroundColor: colors.kuliah, borderRadius: 4 },
+                { label: 'Wirausaha', data: dataWira, backgroundColor: colors.wira, borderRadius: 4 },
+                { label: 'Belum Kerja', data: dataBelum, backgroundColor: colors.belum, borderRadius: 4 }
+            ]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, scales: { x: { stacked: false }, y: { beginAtZero: true } } }
+    });
+}
+
+if (document.getElementById('chartSekolah')) {
+    new Chart(document.getElementById('chartSekolah'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Negeri', 'Swasta'],
+            datasets: [{ data: [{{ sekolah_data.negeri or 0 }}, {{ sekolah_data.swasta or 0 }}], backgroundColor: [colors.kerja, colors.kuliah] }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+    });
+}
+
+let tKerja=0, tKuliah=0, tWira=0, tBelum=0;
+{% for l in lulusan_data %}tKerja+={{ l.kerja }}; tKuliah+={{ l.kuliah }}; tWira+={{ l.wirausaha }}; tBelum+={{ l.belum_kerja }};{% endfor %}
+
+if (document.getElementById('chartTotalLulusan')) {
+    new Chart(document.getElementById('chartTotalLulusan'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Kerja','Kuliah','Wirausaha','Belum Kerja'],
+            datasets: [{ data: [tKerja,tKuliah,tWira,tBelum], backgroundColor: [colors.kerja,colors.kuliah,colors.wira,colors.belum] }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Error — FBKK{% endblock %}
+
+{% block content %}
+<div class="container error-page">
+    <div class="card">
+        <div class="error-icon">⚠️</div>
+        <h1 style="margin:0 0 0.5rem;font-size:1.25rem;">Terjadi Kesalahan</h1>
+        <p style="color:var(--text-muted);margin:0 0 1.25rem;">{{ message or "Terjadi kesalahan yang tidak terduga." }}</p>
+        <a href="{{ url_for('home') }}" class="btn btn-primary">Kembali ke Beranda</a>
+    </div>
+</div>
+{% endblock %}

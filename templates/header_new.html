@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<header>
+    <nav class="navbar">
+        <div class="container1">
+            <div class="container-logo">
+                <img src="{{ url_for('static', filename='img/logodisnaker.png') }}" alt="Logo FBKK">
+                <img src="{{ url_for('static', filename='img/logofbkk.png') }}" alt="Logo FBKK">
+                <a href="{{ url_for('home') }}" class="logo">FBKK Jember</a>
+            </div>
+            
+            <ul class="container-navlink">
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('profil') }}">Profil</a></li>
+                <li><a href="{{ url_for('galeri') }}">Galeri</a></li>
+                {% if 'user_id' in session %}
+                    {% if session['role'] == 'fbkk' %}
+                        <li><a href="{{ url_for('dashboard_anggota') }}">Dashboard Anggota</a></li>
+                    {% elif session['role'] == 'disnaker' %}
+                        <li><a href="{{ url_for('dashboard_disnaker') }}">Dashboard Disnaker</a></li>
+                    {% endif %}
+                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('login') }}">Login</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+</header>
+</body>
+</html>

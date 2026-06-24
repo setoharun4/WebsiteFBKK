@@ -1,0 +1,185 @@
+{% extends "dashboard_shell.html" %}
+
+{% block title %}Verifikasi Akun — FBKK{% endblock %}
+{% block page_heading %}Verifikasi Akun Pengguna{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Kelola sekolah anggota, verifikasi akun, dan hubungan akun–sekolah</p>{% endblock %}
+
+{% block page_content %}
+    <div class="panel-tabs" role="tablist" aria-label="Bagian verifikasi">
+        <button type="button" class="panel-tab active" data-panel="sekolah">
+            Kelola Sekolah
+            <span class="panel-tab-badge">{{ sekolah_kosong|length }}</span>
+        </button>
+        <button type="button" class="panel-tab" data-panel="akun">
+            Kelola Akun
+            <span class="panel-tab-badge panel-tab-badge--warning">{{ users|length }}</span>
+            <span class="panel-tab-badge panel-tab-badge--success">{{ verified_users|length }}</span>
+        </button>
+    </div>
+
+    <section id="panel-sekolah" class="panel-section active" data-panel="sekolah">
+        <div class="panel-section-header">
+            <h2 class="section-title">Kelola Sekolah Anggota FBKK</h2>
+            <p class="panel-section-desc">Tambahkan sekolah baru dan lihat daftar sekolah yang belum terhubung ke akun pengguna.</p>
+        </div>
+
+        <div class="form-section section">
+            <h3 class="section-title" style="font-size:1.05rem;">Tambah Sekolah Baru</h3>
+            <form action="{{ url_for('tambah_sekolah_anggota') }}" method="POST">
+                <div class="form-grid">
+                    <div class="form-group" style="grid-column:1/-1;">
+                        <label for="sekolah" class="form-label">Nama Sekolah</label>
+                        <input type="text" id="sekolah" name="sekolah" class="form-input" placeholder="Contoh: SMK Negeri 1 Jember" required maxlength="255">
+                    </div>
+                    <div class="form-group" style="grid-column:1/-1;">
+                        <label for="alamat" class="form-label">Alamat</label>
+                        <input type="text" id="alamat" name="alamat" class="form-input" placeholder="Alamat lengkap sekolah" required maxlength="500">
+                    </div>
+                    <div class="form-group">
+                        <label for="kecamatan" class="form-label">Kecamatan</label>
+                        <input type="text" id="kecamatan" name="kecamatan" class="form-input" placeholder="Kecamatan" required maxlength="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="status" class="form-label">Status</label>
+                        <select id="status" name="status" class="form-select" required>
+                            <option value="Negeri">Negeri</option>
+                            <option value="Swasta">Swasta</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Tambah Sekolah</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card section">
+            <h3 class="section-title" style="font-size:1.05rem;">Sekolah Belum Punya Akun ({{ sekolah_kosong|length }})</h3>
+            <p class="panel-section-desc" style="margin-bottom:1rem;">Sekolah ini tersedia untuk dipilih saat verifikasi akun baru.</p>
+            {% if sekolah_kosong %}
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Nama Sekolah</th>
+                            <th>Alamat</th>
+                            <th>Kecamatan</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in sekolah_kosong %}
+                        <tr>
+                            <td data-label="Sekolah"><strong>{{ s.sekolah }}</strong></td>
+                            <td data-label="Alamat">{{ s.alamat }}</td>
+                            <td data-label="Kecamatan">{{ s.kecamatan }}</td>
+                            <td data-label="Status">{{ s.status }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <p>Semua sekolah sudah terhubung ke akun, atau belum ada sekolah terdaftar.</p>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <section id="panel-akun" class="panel-section" data-panel="akun" hidden>
+        <div class="panel-section-header">
+            <h2 class="section-title">Kelola Akun Pengguna</h2>
+            <p class="panel-section-desc">Verifikasi akun baru, hapus akun tidak valid, atau putus hubungan akun yang sudah terverifikasi.</p>
+        </div>
+
+        <div class="card section">
+            <h3 class="section-title" style="font-size:1.05rem;">Menunggu Verifikasi ({{ users|length }})</h3>
+            <p class="panel-section-desc" style="margin-bottom:1rem;">Pilih sekolah untuk setiap akun baru, lalu klik Verifikasi.</p>
+            <div class="table-controls">
+                <div class="search-wrapper">
+                    <input type="text" id="search-input" class="search-input" placeholder="Cari username...">
+                    <span class="search-icon">🔍</span>
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="data-table" id="user-verification-table">
+                    <thead>
+                        <tr>
+                            <th>Tanggal Daftar</th>
+                            <th>Username</th>
+                            <th>Pilih Sekolah</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr data-search="{{ user.username|lower }}">
+                            <td data-label="Tanggal">{{ user.created_at.strftime('%d/%m/%Y %H:%M') if user.created_at else '-' }}</td>
+                            <td data-label="Username"><strong>{{ user.username }}</strong></td>
+                            <td data-label="Sekolah">
+                                <select class="dropdown-sekolah form-select" data-user-id="{{ user.user_id }}">
+                                    <option value="">-- Pilih Sekolah --</option>
+                                    {% for s in sekolah %}
+                                    <option value="{{ s.id }}">{{ s.sekolah }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td data-label="Aksi">
+                                <div class="action-buttons">
+                                    <button type="button" class="btn btn-success btn-sm btn-verifikasi" data-user-id="{{ user.user_id }}">Verifikasi</button>
+                                    <button type="button" class="btn btn-delete btn-sm btn-hapus-akun" data-user-id="{{ user.user_id }}">Hapus</button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="4" class="no-data">Tidak ada akun menunggu verifikasi</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card section">
+            <h3 class="section-title" style="font-size:1.05rem;">Akun Terverifikasi ({{ verified_users|length }})</h3>
+            <p class="panel-section-desc" style="margin-bottom:1rem;">
+                Memutus hubungan akun hanya melepas koneksi ke sekolah. Data tahunan dan laporan tetap tersimpan pada data sekolah tersebut.
+            </p>
+            <div class="table-container">
+                <table class="data-table" id="verified-users-table">
+                    <thead>
+                        <tr>
+                            <th>Tanggal Daftar</th>
+                            <th>Username</th>
+                            <th>Nama Sekolah</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in verified_users %}
+                        <tr data-user-id="{{ user.user_id }}">
+                            <td data-label="Tanggal">{{ user.created_at.strftime('%d/%m/%Y %H:%M') if user.created_at else '-' }}</td>
+                            <td data-label="Username">{{ user.username }}</td>
+                            <td data-label="Sekolah">{{ user.sekolah }}</td>
+                            <td data-label="Aksi">
+                                <div class="action-buttons">
+                                    <a href="{{ url_for('notifikasi_kirim', user_id=user.user_id) }}" class="btn btn-secondary btn-sm">Notifikasi</a>
+                                    <button type="button" class="btn btn-warning btn-sm btn-putus-akun" data-user-id="{{ user.user_id }}" data-username="{{ user.username }}" data-sekolah="{{ user.sekolah }}">
+                                        Putus Hubungan
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="4" class="no-data">Belum ada akun terverifikasi</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/verifikasi.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "dashboard_shell.html" %}
+
+{% block title %}Riwayat Laporan — FBKK{% endblock %}
+{% block page_heading %}Riwayat Laporan{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Semua laporan yang pernah diunggah</p>{% endblock %}
+
+{% block page_content %}
+    <div class="form-actions" style="margin-bottom:1rem;">
+        <a href="{{ url_for('upload_laporan') }}" class="btn btn-primary">+ Upload Baru</a>
+    </div>
+
+    <div class="card section">
+        <div class="table-container" style="border:none;box-shadow:none;">
+            <table class="data-table">
+                <thead>
+                    <tr><th>No</th><th>Judul</th><th>Deskripsi</th><th>File</th><th>Tanggal</th>{% if session.get('role') == 'fbkk' %}<th>Aksi</th>{% endif %}</tr>
+                </thead>
+                <tbody>
+                    {% for item in laporan_list %}
+                    <tr>
+                        <td data-label="No">{{ loop.index }}</td>
+                        <td data-label="Judul">{{ item.judul }}</td>
+                        <td data-label="Deskripsi" class="description-cell">{{ item.deskripsi[:60] }}{% if item.deskripsi|length > 60 %}…{% endif %}</td>
+                        <td data-label="File"><a href="/static/uploads/{{ item.file_path }}" class="btn-download btn-sm" target="_blank">Unduh</a></td>
+                        <td data-label="Tanggal">{{ item.created_at.strftime('%d/%m/%Y %H:%M') if item.created_at else '-' }}</td>
+                        <td data-label="Aksi">
+                            {% if session.get('role') == 'fbkk' %}
+                            <form action="{{ url_for('hapus_laporan_anggota', id=item.id) }}" method="POST" class="inline-form"
+                                  onsubmit="return confirm('Hapus laporan ini?');">
+                                <button type="submit" class="btn btn-delete btn-sm">Hapus</button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" class="no-data">Belum ada laporan. <a href="{{ url_for('upload_laporan') }}">Upload sekarang</a></td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

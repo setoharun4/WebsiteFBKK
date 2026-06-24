@@ -1,0 +1,48 @@
+<aside class="app-sidebar" aria-label="Navigasi dashboard Disnaker">
+    <p class="app-sidebar-label">Dashboard Disnaker</p>
+    <nav class="app-sidebar-nav">
+        <a href="{{ url_for('dashboard_disnaker') }}" class="app-sidebar-link{{ ' active' if current_endpoint == 'dashboard_disnaker' else '' }}">
+            <span class="app-sidebar-icon" aria-hidden="true">📊</span>
+            <span class="app-sidebar-text">
+                <strong>Ringkasan</strong>
+                <small>Statistik & data FBKK</small>
+            </span>
+        </a>
+        <a href="{{ url_for('dashboard_laporan') }}" class="app-sidebar-link{{ ' active' if current_endpoint == 'dashboard_laporan' else '' }}">
+            <span class="app-sidebar-icon" aria-hidden="true">📄</span>
+            <span class="app-sidebar-text">
+                <strong>Laporan Masuk</strong>
+                <small>Laporan dari anggota</small>
+            </span>
+        </a>
+        <a href="{{ url_for('dashboard_informasi') }}" class="app-sidebar-link{{ ' active' if current_endpoint == 'dashboard_informasi' else '' }}">
+            <span class="app-sidebar-icon" aria-hidden="true">📢</span>
+            <span class="app-sidebar-text">
+                <strong>Informasi</strong>
+                <small>Pengumuman beranda</small>
+            </span>
+        </a>
+        <a href="{{ url_for('verifikasi_akun') }}" class="app-sidebar-link{{ ' active' if current_endpoint == 'verifikasi_akun' else '' }}">
+            <span class="app-sidebar-icon" aria-hidden="true">✅</span>
+            <span class="app-sidebar-text">
+                <strong>Verifikasi Akun</strong>
+                <small>Sekolah & pengguna</small>
+            </span>
+        </a>
+        <a href="{{ url_for('notifikasi_kirim') }}" class="app-sidebar-link{{ ' active' if current_endpoint == 'notifikasi_kirim' else '' }}">
+            <span class="app-sidebar-icon" aria-hidden="true">🔔</span>
+            <span class="app-sidebar-text">
+                <strong>Kirim Notifikasi</strong>
+                <small>Pengingat ke pengurus sekolah</small>
+            </span>
+        </a>
+        <a href="{{ url_for('galeri') }}" class="app-sidebar-link{{ ' active' if current_endpoint == 'galeri' else '' }}">
+            <span class="app-sidebar-icon" aria-hidden="true">🖼️</span>
+            <span class="app-sidebar-text">
+                <strong>Galeri</strong>
+                <small>Dokumentasi kegiatan</small>
+            </span>
+        </a>
+    </nav>
+    <a href="{{ url_for('home') }}" class="app-sidebar-back">← Kembali ke Beranda</a>
+</aside>

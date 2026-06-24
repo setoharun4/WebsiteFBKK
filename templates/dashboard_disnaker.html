@@ -1,0 +1,69 @@
+{% extends "dashboard_shell.html" %}
+
+{% block title %}Dashboard Disnaker — FBKK{% endblock %}
+{% block page_heading %}Dashboard Disnaker{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Pantau dan kelola data FBKK secara keseluruhan</p>{% endblock %}
+
+{% block page_content %}
+    <div class="statistics-section section">
+        <h2 class="section-title">Rekapitulasi Data FBKK</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Sekolah Terdaftar BKK</h3>
+                <div class="stat-number">{{ sekolah_data.total_sekolah if sekolah_data else 0 }}</div>
+                <div class="stat-details">
+                    <span>Negeri: {{ sekolah_data.negeri if sekolah_data else 0 }}</span>
+                    <span>Swasta: {{ sekolah_data.swasta if sekolah_data else 0 }}</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <h3>Total Lulusan</h3>
+                <div class="stat-number">{{ total_lulusan.total_lulusan if total_lulusan else 0 }}</div>
+                <div class="stat-details">
+                    <span>Kerja: {{ total_lulusan.total_kerja if total_lulusan else 0 }}</span>
+                    <span>Kuliah: {{ total_lulusan.total_kuliah if total_lulusan else 0 }}</span>
+                    <span>Wirausaha: {{ total_lulusan.total_wirausaha if total_lulusan else 0 }}</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <h3>Perusahaan Mitra</h3>
+                <div class="stat-number">{{ mitra_data.total_mitra if mitra_data else 0 }}</div>
+                <div class="stat-details"><span>Total mitra terdaftar</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="yearly-data-section section">
+        <h2 class="section-title">Data Lulusan Per Tahun</h2>
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Tahun</th>
+                        <th>SMK Terdata</th>
+                        <th>Kerja</th>
+                        <th>Kuliah</th>
+                        <th>Wirausaha</th>
+                        <th>Belum Kerja</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lulusan in lulusan_data %}
+                    <tr>
+                        <td data-label="Tahun"><strong>{{ lulusan.tahun }}</strong></td>
+                        <td data-label="SMK">{{ lulusan.jumlah_sekolah }}</td>
+                        <td data-label="Kerja">{{ lulusan.kerja }}</td>
+                        <td data-label="Kuliah">{{ lulusan.kuliah }}</td>
+                        <td data-label="Wirausaha">{{ lulusan.wirausaha }}</td>
+                        <td data-label="Belum Kerja">{{ lulusan.belum_bekerja }}</td>
+                        <td data-label="Total"><strong>{{ lulusan.total_per_tahun }}</strong></td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="7" class="no-data">Belum ada data</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

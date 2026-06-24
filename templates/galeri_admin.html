@@ -1,0 +1,13 @@
+{% extends "dashboard_shell.html" %}
+
+{% block title %}Galeri — FBKK Jember{% endblock %}
+{% block page_heading %}Galeri Kegiatan{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">Dokumentasi kegiatan Forum Bursa Kerja Khusus Jember</p>{% endblock %}
+
+{% block page_content %}
+    {% include 'partials/galeri_content.html' %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/galeri.js') }}"></script>
+{% endblock %}

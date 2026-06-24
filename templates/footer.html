@@ -1,0 +1,28 @@
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <h3>FBKK Kabupaten Jember</h3>
+            <p>Forum Bursa Kerja Khusus — wadah koordinasi BKK sekolah menengah kejuruan dalam mempersiapkan lulusan siap kerja.</p>
+        </div>
+        <div class="footer-col">
+            <h4>Navigasi</h4>
+            <ul class="footer-links">
+                <li><a href="{{ url_for('home') }}">Beranda</a></li>
+                <li><a href="{{ url_for('profil') }}">Profil</a></li>
+                <li><a href="{{ url_for('galeri') }}">Galeri</a></li>
+                <li><a href="{{ url_for('login') }}">Masuk</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>Kontak</h4>
+            <ul class="footer-links">
+                <li>Dinas Tenaga Kerja Kab. Jember</li>
+                <li>Jl. Veteran, Jember</li>
+                <li>Jawa Timur, Indonesia</li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; {{ current_year }} FBKK Kabupaten Jember. Semua hak dilindungi.</p>
+    </div>
+</footer>
